@@ -3,475 +3,246 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hello World</title>
+  <title>Wyszukiwarka</title>
+  <meta name="color-scheme" content="light dark">
   <style>
-    :root {
-      --bg: #ffffff;
-      --text: #111827;
-      --card: #f3f4f6;
-      --accent: #2563eb;
-      --accent-2: #1e40af;
+    /* Material-like, accessible layout (Google UX-inspired) */
+    :root{
+      --bg:#f6f8fb; --surface:#ffffff; --text:#0f1724; --muted:#6b7280;
+      --accent:#1e88ff; --accent-2:#1565c0; --radius:12px; --shadow: 0 8px 30px rgba(2,6,23,0.08);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
-    [data-theme="dark"] {
-      --bg: #0b1220;
-      --text: #e6eef8;
-      --card: #131826;
-      --accent: #60a5fa;
-      --accent-2: #1e3a8a;
+    [data-theme="dark"]{
+      --bg:#071025; --surface:#0f1724; --text:#e6eef8; --muted:#9aa7bb;
+      --accent:#60a5fa; --accent-2:#2563eb; --shadow: 0 10px 36px rgba(2,6,23,0.6);
     }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: var(--bg);
-      color: var(--text);
-      transition: background .25s ease, color .25s ease;
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);transition:background .18s,color .18s;}
+    a{color:var(--accent); text-decoration:none}
+    .appbar{
+      position:fixed; top:0; left:0; right:0; height:64px; display:flex; align-items:center;
+      justify-content:space-between; padding:0 16px; gap:12px; background:transparent; z-index:50;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:44px;height:44px;border-radius:10px}
+    .brand h2{margin:0;font-size:16px;font-weight:700}
+    .controls{display:flex;align-items:center;gap:10px}
+
+    .icon-btn{
+      width:44px;height:44px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);
+      background:var(--surface); display:inline-flex;align-items:center;justify-content:center; cursor:pointer;
+      transition:transform .08s, box-shadow .08s;
+    }
+    .icon-btn:active{transform:translateY(1px)}
+    .hamburger{background:transparent;border:none;padding:8px;display:flex;flex-direction:column;gap:5px;justify-content:center;align-items:center}
+    .hamburger span{width:22px;height:2.8px;background:var(--text);border-radius:3px;display:block;transition:transform .18s,opacity .18s}
+    .hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+    .menu{
+      position:fixed; top:72px; right:12px; min-width:160px; background:var(--surface); border-radius:10px;
+      box-shadow:var(--shadow); padding:8px; display:none; flex-direction:column; gap:6px; z-index:49;
+    }
+    .menu.open{display:flex}
+    .menu button{background:transparent;border:none;padding:10px 12px;text-align:left;border-radius:8px;cursor:pointer;color:var(--text);font-weight:600}
+    .menu button:hover{background:rgba(0,0,0,0.04)}
+
+    main{min-height:100vh; display:flex;align-items:center;justify-content:center;padding:88px 20px 40px;box-sizing:border-box}
+    .card{width:min(840px,96%);max-width:920px;display:flex;gap:28px;align-items:center;justify-content:space-between;background:var(--surface);
+          border-radius:14px;padding:28px;box-shadow:var(--shadow);box-sizing:border-box}
+    .left{flex:1;min-width:260px}
+    .headline{margin:0 0 8px 0;font-size:22px;font-weight:700}
+    .sub{margin:0;color:var(--muted);font-size:15px}
+
+    .search-wrap{flex:1;display:flex;align-items:center;gap:12px;background:transparent;padding:12px;border-radius:12px}
+    .search-input{
+      flex:1;height:52px;padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,0.06);font-size:16px;
+      outline:none;background:transparent;color:var(--text);box-sizing:border-box;transition:box-shadow .12s,border-color .12s;
+    }
+    .search-input:focus{box-shadow:0 8px 24px rgba(30,136,255,0.06);border-color:var(--accent-2)}
+    .search-btn{
+      height:48px;padding:12px 18px;border-radius:12px;border:none;background:linear-gradient(180deg,var(--accent),var(--accent-2));
+      color:#fff;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(37,99,235,0.12);
+    }
+    .search-btn:active{transform:translateY(1px)}
+
+    /* responsive */
+    @media (max-width:880px){
+      .card{flex-direction:column;align-items:stretch;padding:20px}
+      .left{text-align:center}
+    }
+    @media (max-width:520px){
+      .brand h2{display:none}
+      .appbar{padding:0 10px}
+      .card{padding:16px}
+      .search-input{height:44px}
     }
 
-    .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-
-    .lewy-gorny-obrazek {
-      position: absolute;
-      top: 10px;
-      left: 50px;
-      width: 80px;
-      height: auto;
-      margin: 0;
-      z-index: 10;
-    }
-
-    /* theme icon (top-right, left of hamburger) */
-    .theme-toggle {
-      position: fixed;
-      top: 10px;
-      right: 64px; /* left of hamburger (hamburger right:10px width ~44px + gap) */
-      width: 44px;
-      height: 44px;
-      padding: 6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--card);
-      color: var(--text);
-      border-radius: 10px;
-      border: 1px solid rgba(0,0,0,0.06);
-      cursor: pointer;
-      z-index: 42;
-    }
-    .theme-toggle svg { width:22px; height:22px; display:block; }
-
-    /* hamburger (top-right) */
-    .hamburger {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      left: auto;
-      width: 44px;
-      height: 36px;
-      padding: 6px;
-      display: inline-flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      z-index: 40;
-    }
-    .hamburger span {
-      display: block;
-      height: 3px;
-      background: var(--text);
-      border-radius: 3px;
-      transition: transform .25s ease, opacity .25s ease;
-    }
-    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-    /* menu dropdown (right under hamburger) */
-    .menu {
-      position: fixed;
-      top: 56px;
-      right: 10px;
-      background: var(--card);
-      color: var(--text);
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(2,6,23,0.12);
-      padding: 8px;
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 140px;
-      z-index: 39;
-    }
-    .menu.open { display: flex; }
-    .menu button {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      text-align: left;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .menu button:hover {
-      background: rgba(0,0,0,0.04);
-    }
-
-    /* modal (login) */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(2,6,23,0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 60;
-      padding: 20px;
-    }
-    .modal-backdrop.open { display: flex; }
-    .modal {
-      background: var(--card);
-      color: var(--text);
-      width: 100%;
-      max-width: 420px;
-      border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(2,6,23,0.25);
-      padding: 20px;
-    }
-    .modal h2 { margin: 0 0 12px 0; font-size: 18px; }
-    .modal form { display: grid; gap: 10px; }
-    .modal input[type="text"],
-    .modal input[type="password"],
-    .modal input[type="email"] {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(0,0,0,0.08);
-      background: transparent;
-      color: var(--text);
-      outline: none;
-      box-sizing: border-box;
-    }
-    .modal .modal-actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      margin-top: 6px;
-      align-items: center;
-    }
-    .modal .links { display:flex; gap:8px; align-items:center; }
-    .btn {
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .btn-ghost {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid rgba(0,0,0,0.06);
-    }
-    .btn-primary {
-      background: linear-gradient(180deg,var(--accent),var(--accent-2));
-      color: #fff;
-      box-shadow: 0 6px 18px rgba(37,99,235,0.16);
-    }
-
-    /* centered container with header + search */
-    .center {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 18px;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    /* search card */
-    .search-wrap {
-      width: min(720px, 90vw);
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      background: var(--card);
-      padding: 12px;
-      border-radius: 12px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.06);
-    }
-    .search-wrap input[type="search"] {
-      flex: 1;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(0,0,0,0.06);
-      background: transparent;
-      color: var(--text);
-      outline: none;
-      font-size: 16px;
-    }
-    .search-btn {
-      background: linear-gradient(180deg,var(--accent),var(--accent-2));
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 6px 18px rgba(37,99,235,0.18);
-      font-weight: 600;
-      transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
-    }
-    .search-btn:hover { transform: translateY(-1px); opacity: 0.98; }
-    .search-btn:active { transform: translateY(0); box-shadow: 0 4px 12px rgba(37,99,235,0.14); }
-
-    h1 { text-align: center; margin: 0; font-size: 28px; }
-    p { text-align: center; margin: 0; color: rgba(17,24,39,0.7); }
-    @media (max-width:520px) {
-      .search-wrap { padding: 10px; gap: 8px; }
-      .search-btn { padding: 9px 12px; }
-      .lewy-gorny-obrazek { width: 56px; left: 46px; }
-      .theme-toggle { right: 60px; } /* small adjustment on mobile */
-    }
+    /* modal and form (login) */
+    .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.44);z-index:80;padding:20px}
+    .modal-backdrop.open{display:flex}
+    .modal{width:100%;max-width:420px;background:var(--surface);border-radius:12px;padding:20px;box-shadow:0 20px 50px rgba(2,6,23,0.28)}
+    .modal h2{margin:0 0 12px;font-size:18px}
+    .modal form{display:grid;gap:10px}
+    .modal input{height:44px;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:var(--text)}
+    .modal .row{display:flex;justify-content:space-between;align-items:center}
+    .modal .actions{display:flex;gap:8px;justify-content:flex-end}
+    .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
 </head>
 <body>
-  <img src="images/moj-obrazek.png" alt="Mój obrazek" class="lewy-gorny-obrazek" />
+  <header class="appbar" role="banner">
+    <div class="brand" aria-hidden="false">
+      <img src="images/moj-obrazek.png" alt="Logo" />
+      <h2>Wyszukiwarka</h2>
+    </div>
 
-  <button class="theme-toggle" id="themeToggle" aria-label="Przełącz tryb" aria-pressed="false">
-    <!-- svg will be controlled by JS -->
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor"/>
-    </svg>
-  </button>
+    <div class="controls" role="toolbar" aria-label="Kontrolki">
+      <button id="themeToggle" class="icon-btn" aria-label="Przełącz tryb" title="Przełącz tryb" type="button"></button>
 
-  <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
+      <button id="hamburger" class="icon-btn hamburger" aria-label="Otwórz menu" aria-expanded="false" title="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
 
-  <div class="menu" id="menu" role="menu" aria-hidden="true">
+  <div id="menu" class="menu" role="menu" aria-hidden="true">
     <button id="loginBtn" type="button" role="menuitem">Zaloguj</button>
     <button id="registerBtn" type="button" role="menuitem">Zarejestruj</button>
   </div>
 
-  <main class="center">
-    <h1>Wyszukiwarka</h1>
+  <main>
+    <section class="card" aria-labelledby="searchTitle">
+      <div class="left">
+        <h3 id="searchTitle" class="headline">Szybkie wyszukiwanie</h3>
+        <p class="sub">Wyszukuj w sieci bezpośrednio z tej strony. Prosty, szybki i dostępny interfejs zgodny z zasadami Google UX.</p>
+      </div>
 
-    <div class="search-wrap" role="search" aria-label="Wyszukiwarka">
-      <input id="q" type="search" placeholder="Szukaj..." aria-label="Pole wyszukiwania" />
-      <button id="searchBtn" class="search-btn" type="button">Szukaj</button>
-    </div>
+      <div class="search-wrap" role="search" aria-label="Wyszukiwarka">
+        <input id="q" class="search-input" type="search" placeholder="Szukaj w Google..." aria-label="Pole wyszukiwania" />
+        <button id="searchBtn" class="search-btn" type="button">Szukaj</button>
+      </div>
+    </section>
   </main>
 
-  <!-- Login modal -->
-  <div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document" aria-labelledby="loginTitle">
+  <!-- login modal -->
+  <div id="loginModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="loginTitle">
+    <div class="modal" role="document">
       <h2 id="loginTitle">Zaloguj się</h2>
       <form id="loginForm" autocomplete="off">
-        <label for="loginUser">Email lub nazwa użytkownika</label>
+        <label class="sr-only" for="loginUser">Email lub nazwa użytkownika</label>
         <input id="loginUser" name="username" type="text" placeholder="Email lub nazwa użytkownika" required />
 
-        <label for="loginPass">Hasło</label>
+        <label class="sr-only" for="loginPass">Hasło</label>
         <input id="loginPass" name="password" type="password" placeholder="Hasło" required />
 
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <label style="display:flex;align-items:center;gap:8px;font-size:14px;">
-            <input id="loginRemember" name="remember" type="checkbox" />
-            <span>Zapamiętaj mnie</span>
+        <div class="row" style="gap:12px;align-items:center">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px">
+            <input id="loginRemember" name="remember" type="checkbox" /> <span>Zapamiętaj mnie</span>
           </label>
-          <div class="links">
-            <button type="button" class="btn btn-ghost" id="forgotBtn">Zapomniałeś hasła?</button>
-          </div>
+          <button id="forgotBtn" type="button" class="icon-btn" title="Odzyskaj hasło">?</button>
         </div>
 
-        <div class="modal-actions">
-          <div></div>
-          <div>
-            <button type="button" class="btn btn-ghost" id="loginCancel">Anuluj</button>
-            <button type="submit" class="btn btn-primary">Zaloguj</button>
-          </div>
+        <div class="actions" style="margin-top:6px">
+          <button id="loginCancel" type="button" class="icon-btn btn-ghost">Anuluj</button>
+          <button type="submit" class="search-btn">Zaloguj</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // theme toggle with icon, persistence
+    // Theme toggle (persist, synced with register.html)
     (function(){
       const root = document.documentElement;
       const btn = document.getElementById('themeToggle');
-      const lsKey = 'theme-preference';
-
-      const svgSun = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor"/></svg>';
-      const svgMoon = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>';
-
-      function applyTheme(t) {
-        if (t === 'dark') {
-          root.setAttribute('data-theme','dark');
-          btn.innerHTML = svgMoon;
-          btn.setAttribute('aria-pressed','true');
-          btn.setAttribute('title','Tryb: ciemny');
-        } else {
-          root.removeAttribute('data-theme');
-          btn.innerHTML = svgSun;
-          btn.setAttribute('aria-pressed','false');
-          btn.setAttribute('title','Tryb: jasny');
-        }
+      const key = 'theme-preference';
+      const sun = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor"/></svg>';
+      const moon = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>';
+      function apply(t){
+        if(t==='dark'){ root.setAttribute('data-theme','dark'); btn.innerHTML = moon; btn.setAttribute('aria-pressed','true'); }
+        else{ root.removeAttribute('data-theme'); btn.innerHTML = sun; btn.setAttribute('aria-pressed','false'); }
       }
-
-      const saved = localStorage.getItem(lsKey) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      applyTheme(saved);
-
-      btn.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
-        localStorage.setItem(lsKey, next);
+      const saved = localStorage.getItem(key) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      apply(saved);
+      btn.addEventListener('click', ()=> {
+        const cur = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const next = cur === 'dark' ? 'light' : 'dark';
+        apply(next); localStorage.setItem(key, next);
       });
     })();
 
-    // simple search: open Google results in new tab
+    // Search behaviour: open Google results
     (function(){
       const input = document.getElementById('q');
       const btn = document.getElementById('searchBtn');
-      function doSearch() {
-        const val = input.value.trim();
-        if (!val) { input.focus(); return; }
-        const url = 'https://www.google.com/search?q=' + encodeURIComponent(val);
-        window.open(url, '_blank');
-      }
+      function doSearch(){ const v = input.value.trim(); if(!v){ input.focus(); return;} window.open('https://www.google.com/search?q='+encodeURIComponent(v), '_blank'); }
       btn.addEventListener('click', doSearch);
-      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
+      input.addEventListener('keydown', e => { if(e.key === 'Enter') doSearch(); });
     })();
 
-    // hamburger toggles menu
+    // Menu / hamburger
     (function(){
       const ham = document.getElementById('hamburger');
       const menu = document.getElementById('menu');
-      ham.addEventListener('click', (e) => {
-        e.stopPropagation();
-        ham.classList.toggle('open');
-        const isOpen = ham.classList.contains('open');
-        ham.setAttribute('aria-expanded', String(isOpen));
-        menu.classList.toggle('open', isOpen);
-        menu.setAttribute('aria-hidden', String(!isOpen));
+      ham.addEventListener('click', e => {
+        e.stopPropagation(); ham.classList.toggle('open');
+        const is = ham.classList.contains('open');
+        ham.setAttribute('aria-expanded', String(is));
+        menu.classList.toggle('open', is);
+        menu.setAttribute('aria-hidden', String(!is));
       });
-      // close menu on outside click or ESC
-      document.addEventListener('click', (e) => {
-        if (!menu.contains(e.target) && !ham.contains(e.target) && !document.getElementById('themeToggle').contains(e.target)) {
-          ham.classList.remove('open');
-          ham.setAttribute('aria-expanded','false');
-          menu.classList.remove('open');
-          menu.setAttribute('aria-hidden','true');
+      document.addEventListener('click', e => {
+        if(!menu.contains(e.target) && !ham.contains(e.target) && !document.getElementById('themeToggle').contains(e.target)){
+          ham.classList.remove('open'); ham.setAttribute('aria-expanded','false'); menu.classList.remove('open'); menu.setAttribute('aria-hidden','true');
         }
       });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          ham.classList.remove('open');
-          ham.setAttribute('aria-expanded','false');
-          menu.classList.remove('open');
-          menu.setAttribute('aria-hidden','true');
-        }
-      });
+      document.addEventListener('keydown', e => { if(e.key==='Escape'){ ham.classList.remove('open'); ham.setAttribute('aria-expanded','false'); menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); } });
     })();
 
-    // login modal behaviour
+    // Login modal behaviour (accessible focus handling)
     (function(){
       const loginBtn = document.getElementById('loginBtn');
       const modal = document.getElementById('loginModal');
-      const loginForm = document.getElementById('loginForm');
-      const cancelBtn = document.getElementById('loginCancel');
-      const firstInput = document.getElementById('loginUser');
-      const forgotBtn = document.getElementById('forgotBtn');
+      const form = document.getElementById('loginForm');
+      const cancel = document.getElementById('loginCancel');
+      const first = document.getElementById('loginUser');
+      const forgot = document.getElementById('forgotBtn');
 
-      function openModal() {
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden','false');
-        // close menu if open
-        const ham = document.getElementById('hamburger');
-        const menu = document.getElementById('menu');
-        if (ham) ham.classList.remove('open');
-        if (menu) { menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); }
-        // focus first input after a tick
-        setTimeout(() => firstInput.focus(), 50);
-        // trap focus basic: listen focus and keydown
-        document.addEventListener('focus', trapFocus, true);
-        document.addEventListener('keydown', onKeyDown);
+      function open(){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+        document.getElementById('hamburger').classList.remove('open'); document.getElementById('menu').classList.remove('open'); setTimeout(()=>first.focus(),60);
+        document.addEventListener('focus', trap, true); document.addEventListener('keydown', onKey);
       }
-
-      function closeModal() {
-        modal.classList.remove('open');
-        modal.setAttribute('aria-hidden','true');
-        document.removeEventListener('focus', trapFocus, true);
-        document.removeEventListener('keydown', onKeyDown);
-        // return focus to login button
-        loginBtn.focus();
+      function close(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; loginBtn.focus();
+        document.removeEventListener('focus', trap, true); document.removeEventListener('keydown', onKey);
       }
+      function trap(e){ if(!modal.contains(e.target)){ e.stopPropagation(); first.focus(); } }
+      function onKey(e){ if(e.key==='Escape') close(); }
 
-      function trapFocus(e) {
-        if (!modal.contains(e.target)) {
-          e.stopPropagation();
-          firstInput.focus();
-        }
-      }
-
-      function onKeyDown(e) {
-        if (e.key === 'Escape') closeModal();
-      }
-
-      // open on click
-      loginBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openModal();
-      });
-
-      // close when clicking backdrop (but not modal content)
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-      });
-
-      cancelBtn.addEventListener('click', (e) => { e.preventDefault(); closeModal(); });
-
-      // fake submit: prevent actual navigation, close modal
-      loginForm.addEventListener('submit', (e) => {
+      loginBtn && loginBtn.addEventListener('click', e => { e.stopPropagation(); open(); });
+      cancel && cancel.addEventListener('click', e => { e.preventDefault(); close(); });
+      modal && modal.addEventListener('click', e => { if(e.target === modal) close(); });
+      form && form.addEventListener('submit', e => {
         e.preventDefault();
-        const data = {
-          username: loginForm.username.value,
-          password: loginForm.password.value,
-          remember: !!document.getElementById('loginRemember').checked
-        };
-        // here you can add validation / send request
-        // For now just close modal and log demo data (no sensitive storage)
-        closeModal();
-        console.log('Login attempt (demo):', data);
+        // demo: close and log (do not store sensitive data)
+        const data = {username: form.username.value, remember: !!document.getElementById('loginRemember').checked};
+        console.log('Login (demo):', data);
+        close();
       });
-
-      // forgot password button (demo)
-      forgotBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Instrukcja odzyskiwania hasła (demo).');
-      });
+      forgot && forgot.addEventListener('click', e => { e.preventDefault(); alert('Instrukcja resetu hasła (demo).'); });
     })();
 
     // register navigation
     (function(){
       const reg = document.getElementById('registerBtn');
-      if (!reg) return;
-      reg.addEventListener('click', (e) => {
+      if(!reg) return;
+      reg.addEventListener('click', e => {
         e.stopPropagation();
-        // close menu if open
-        const ham = document.getElementById('hamburger');
-        const menu = document.getElementById('menu');
-        if (ham) ham.classList.remove('open');
-        if (menu) { menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); }
-        // navigate
-        setTimeout(() => window.location.href = 'register.html', 60);
+        document.getElementById('hamburger').classList.remove('open');
+        const menu = document.getElementById('menu'); if(menu){ menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); }
+        setTimeout(()=> location.href = 'register.html', 80);
       });
     })();
   </script>

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rejestracja</title>
+  <style>
+    :root{
+      --bg:#ffffff; --text:#111827; --card:#f3f4f6;
+      --accent:#2563eb; --accent-2:#1e40af;
+    }
+    [data-theme="dark"]{
+      --bg:#0b1220; --text:#e6eef8; --card:#131826;
+      --accent:#60a5fa; --accent-2:#1e3a8a;
+    }
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      background:var(--bg); color:var(--text); transition:background .2s,color .2s;}
+    .topbar{
+      position:fixed; top:12px; left:12px; right:12px; display:flex; justify-content:space-between; align-items:center;
+      z-index:50;
+    }
+    .back-link{color:var(--text); text-decoration:none; font-weight:600; background:transparent;border-radius:8px;padding:8px 10px;}
+    .theme-toggle{
+      width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;
+      background:var(--card);border-radius:10px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;
+    }
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;}
+    .card{width:100%;max-width:520px;background:var(--card);padding:22px;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.08);}
+    h1{margin:0 0 8px 0;font-size:22px;text-align:center;}
+    p.lead{margin:0 0 18px 0;text-align:center;color:rgba(0,0,0,0.55);}
+    form{display:grid;gap:12px;}
+    label{display:block;font-size:13px;}
+    input[type="text"],input[type="email"],input[type="password"]{
+      width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.07);background:transparent;color:var(--text);
+      box-sizing:border-box;outline:none;
+    }
+    .row{display:flex;gap:10px;}
+    .small{font-size:12px;color:rgba(0,0,0,0.6);}
+    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;}
+    .btn{padding:9px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:600;}
+    .btn-ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--text);}
+    .btn-primary{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 8px 20px rgba(37,99,235,0.14);}
+    .error{color:#d32f2f;font-size:13px;}
+    .success{background:linear-gradient(180deg,#ecfdf5,#bbf7d0);padding:10px;border-radius:8px;color:#065f46;font-weight:600;text-align:center;}
+    @media (max-width:520px){ .topbar{padding:0 6px} .card{padding:16px} }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="back-link" href="index.html" aria-label="Wróć do strony głównej">← Powrót</a>
+    <button class="theme-toggle" id="themeToggle" aria-label="Przełącz tryb" title="Przełącz tryb"></button>
+  </div>
+
+  <main class="wrap" role="main">
+    <section class="card" aria-labelledby="regTitle">
+      <h1 id="regTitle">Utwórz konto</h1>
+      <p class="lead">Wypełnij formularz, aby założyć nowe konto (demo — bez wysyłania danych).</p>
+
+      <div id="msg"></div>
+
+      <form id="registerForm" novalidate autocomplete="off">
+        <div>
+          <label for="user">Nazwa użytkownika</label>
+          <input id="user" name="username" type="text" required minlength="3" placeholder="np. jan_kowal" />
+          <div class="error" id="err-user" aria-live="polite"></div>
+        </div>
+
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="adres@przyklad.pl" />
+          <div class="error" id="err-email" aria-live="polite"></div>
+        </div>
+
+        <div class="row">
+          <div style="flex:1">
+            <label for="pass">Hasło</label>
+            <input id="pass" name="password" type="password" required minlength="8" placeholder="min. 8 znaków" />
+            <div class="error" id="err-pass" aria-live="polite"></div>
+          </div>
+          <div style="flex:1">
+            <label for="pass2">Powtórz hasło</label>
+            <input id="pass2" name="password2" type="password" required placeholder="powtórz hasło" />
+            <div class="error" id="err-pass2" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" onclick="location.href='index.html'">Anuluj</button>
+          <button type="submit" class="btn btn-primary">Zarejestruj</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    // theme toggle: sync with localStorage key 'theme-preference'
+    (function(){
+      const btn = document.getElementById('themeToggle');
+      const root = document.documentElement;
+      const ls = 'theme-preference';
+      const sun = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor"/></svg>';
+      const moon = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>';
+      function apply(t){
+        if(t==='dark'){ root.setAttribute('data-theme','dark'); btn.innerHTML = moon; btn.title='Tryb: ciemny'; }
+        else{ root.removeAttribute('data-theme'); btn.innerHTML = sun; btn.title='Tryb: jasny'; }
+      }
+      const saved = localStorage.getItem(ls) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      apply(saved);
+      btn.addEventListener('click', ()=> {
+        const cur = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const next = cur === 'dark' ? 'light' : 'dark';
+        apply(next); localStorage.setItem(ls, next);
+      });
+    })();
+
+    // registration form validation (client-side demo)
+    (function(){
+      const form = document.getElementById('registerForm');
+      const msg = document.getElementById('msg');
+      const user = document.getElementById('user');
+      const email = document.getElementById('email');
+      const pass = document.getElementById('pass');
+      const pass2 = document.getElementById('pass2');
+      const errUser = document.getElementById('err-user');
+      const errEmail = document.getElementById('err-email');
+      const errPass = document.getElementById('err-pass');
+      const errPass2 = document.getElementById('err-pass2');
+
+      function clearErrors(){
+        errUser.textContent=''; errEmail.textContent=''; errPass.textContent=''; errPass2.textContent=''; msg.innerHTML='';
+      }
+
+      function validEmail(v){
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      }
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        clearErrors();
+        let ok = true;
+        if(!user.value || user.value.trim().length < 3){ errUser.textContent='Nazwa musi mieć co najmniej 3 znaki.'; ok=false; }
+        if(!email.value || !validEmail(email.value)){ errEmail.textContent='Wprowadź poprawny adres email.'; ok=false; }
+        if(!pass.value || pass.value.length < 8){ errPass.textContent='Hasło musi mieć co najmniej 8 znaków.'; ok=false; }
+        if(pass.value !== pass2.value){ errPass2.textContent='Hasła nie są zgodne.'; ok=false; }
+
+        if(!ok) return;
+
+        // Demo: nie wysyłamy nigdzie. Pokaż komunikat sukcesu i zapisz demo (bez hasła) do localStorage
+        msg.innerHTML = '<div class="success">Konto utworzone (demo). Przekierowanie...</div>';
+        try {
+          const store = JSON.parse(localStorage.getItem('demo-users')||'[]');
+          store.push({username:user.value.trim(), email: email.value.trim(), created: Date.now()});
+          localStorage.setItem('demo-users', JSON.stringify(store));
+        } catch(e){ /* ignore */ }
+
+        // po chwili wróć na stronę główną
+        setTimeout(()=> location.href = 'index.html', 1200);
+      });
+
+      // live clear errors
+      [user,email,pass,pass2].forEach(el => el.addEventListener('input', ()=> { if(el.value) { document.getElementById('err-'+(el.id==='pass2'?'pass2':el.id)).textContent=''; } }));
+    })();
+  </script>
+</body>
+</html>

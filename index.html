@@ -253,7 +253,7 @@
 
   <div class="menu" id="menu" role="menu" aria-hidden="true">
     <button id="loginBtn" type="button" role="menuitem">Zaloguj</button>
-    <button type="button" role="menuitem">Zarejestruj</button>
+    <button id="registerBtn" type="button" role="menuitem">Zarejestruj</button>
   </div>
 
   <main class="center">
@@ -430,6 +430,22 @@
         console.log('Login submitted:', {
           username: loginForm.username.value
         });
+      });
+    })();
+
+    // register navigation
+    (function(){
+      const reg = document.getElementById('registerBtn');
+      if (!reg) return;
+      reg.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // close menu if open
+        const ham = document.getElementById('hamburger');
+        const menu = document.getElementById('menu');
+        if (ham) ham.classList.remove('open');
+        if (menu) { menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); }
+        // navigate
+        setTimeout(() => window.location.href = 'register.html', 60);
       });
     })();
   </script>

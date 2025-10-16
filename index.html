@@ -29,6 +29,8 @@
       transition: background .25s ease, color .25s ease;
     }
 
+    .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
     .lewy-gorny-obrazek {
       position: absolute;
       top: 10px;
@@ -142,7 +144,8 @@
     .modal h2 { margin: 0 0 12px 0; font-size: 18px; }
     .modal form { display: grid; gap: 10px; }
     .modal input[type="text"],
-    .modal input[type="password"] {
+    .modal input[type="password"],
+    .modal input[type="email"] {
       width: 100%;
       padding: 10px 12px;
       border-radius: 8px;
@@ -154,10 +157,12 @@
     }
     .modal .modal-actions {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       gap: 8px;
       margin-top: 6px;
+      align-items: center;
     }
+    .modal .links { display:flex; gap:8px; align-items:center; }
     .btn {
       padding: 8px 12px;
       border-radius: 8px;
@@ -234,7 +239,6 @@
   </style>
 </head>
 <body>
-  <!-- ...existing code... -->
   <img src="images/moj-obrazek.png" alt="Mój obrazek" class="lewy-gorny-obrazek" />
 
   <button class="theme-toggle" id="themeToggle" aria-label="Przełącz tryb" aria-pressed="false">
@@ -270,18 +274,28 @@
     <div class="modal" role="document" aria-labelledby="loginTitle">
       <h2 id="loginTitle">Zaloguj się</h2>
       <form id="loginForm" autocomplete="off">
-        <label>
-          <span class="sr-only">Nazwa użytkownika</span>
-          <input id="loginUser" name="username" type="text" placeholder="Nazwa użytkownika" required />
-        </label>
-        <label>
-          <span class="sr-only">Hasło</span>
-          <input id="loginPass" name="password" type="password" placeholder="Hasło" required />
-        </label>
+        <label for="loginUser">Email lub nazwa użytkownika</label>
+        <input id="loginUser" name="username" type="text" placeholder="Email lub nazwa użytkownika" required />
+
+        <label for="loginPass">Hasło</label>
+        <input id="loginPass" name="password" type="password" placeholder="Hasło" required />
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:14px;">
+            <input id="loginRemember" name="remember" type="checkbox" />
+            <span>Zapamiętaj mnie</span>
+          </label>
+          <div class="links">
+            <button type="button" class="btn btn-ghost" id="forgotBtn">Zapomniałeś hasła?</button>
+          </div>
+        </div>
 
         <div class="modal-actions">
-          <button type="button" class="btn btn-ghost" id="loginCancel">Anuluj</button>
-          <button type="submit" class="btn btn-primary">Zaloguj</button>
+          <div></div>
+          <div>
+            <button type="button" class="btn btn-ghost" id="loginCancel">Anuluj</button>
+            <button type="submit" class="btn btn-primary">Zaloguj</button>
+          </div>
         </div>
       </form>
     </div>
@@ -340,7 +354,8 @@
     (function(){
       const ham = document.getElementById('hamburger');
       const menu = document.getElementById('menu');
-      ham.addEventListener('click', () => {
+      ham.addEventListener('click', (e) => {
+        e.stopPropagation();
         ham.classList.toggle('open');
         const isOpen = ham.classList.contains('open');
         ham.setAttribute('aria-expanded', String(isOpen));
@@ -373,16 +388,19 @@
       const loginForm = document.getElementById('loginForm');
       const cancelBtn = document.getElementById('loginCancel');
       const firstInput = document.getElementById('loginUser');
+      const forgotBtn = document.getElementById('forgotBtn');
 
       function openModal() {
         modal.classList.add('open');
         modal.setAttribute('aria-hidden','false');
         // close menu if open
-        document.getElementById('hamburger').classList.remove('open');
-        document.getElementById('menu').classList.remove('open');
+        const ham = document.getElementById('hamburger');
+        const menu = document.getElementById('menu');
+        if (ham) ham.classList.remove('open');
+        if (menu) { menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); }
         // focus first input after a tick
         setTimeout(() => firstInput.focus(), 50);
-        // trap focus basic: listen tab
+        // trap focus basic: listen focus and keydown
         document.addEventListener('focus', trapFocus, true);
         document.addEventListener('keydown', onKeyDown);
       }
@@ -423,13 +441,21 @@
       // fake submit: prevent actual navigation, close modal
       loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        const data = {
+          username: loginForm.username.value,
+          password: loginForm.password.value,
+          remember: !!document.getElementById('loginRemember').checked
+        };
         // here you can add validation / send request
-        // For now just close modal
+        // For now just close modal and log demo data (no sensitive storage)
         closeModal();
-        // optional: show simple confirmation in console
-        console.log('Login submitted:', {
-          username: loginForm.username.value
-        });
+        console.log('Login attempt (demo):', data);
+      });
+
+      // forgot password button (demo)
+      forgotBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Instrukcja odzyskiwania hasła (demo).');
       });
     })();
 

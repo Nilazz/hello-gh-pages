@@ -90,6 +90,28 @@
     .modal .row{display:flex;justify-content:space-between;align-items:center}
     .modal .actions{display:flex;gap:8px;justify-content:flex-end}
     .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    /* footer */
+    .footer{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:12px;
+      display:flex;
+      justify-content:center;
+      z-index:40;
+      pointer-events:none; /* allow clicks through except the inner note */
+    }
+    .footer .note{
+      background:var(--surface);
+      color:var(--muted);
+      padding:6px 10px;
+      border-radius:10px;
+      box-shadow:var(--shadow);
+      font-size:13px;
+      pointer-events:auto; /* allow interaction if needed */
+      opacity:0.95;
+    }
   </style>
 </head>
 <body>
@@ -151,6 +173,11 @@
       </form>
     </div>
   </div>
+
+  <!-- footer -->
+  <footer class="footer" role="contentinfo" aria-label="Stopka">
+    <div class="note">Design by GPT-5 mini 2k25 XD</div>
+  </footer>
 
   <script>
     // Theme toggle (persist, synced with register.html)

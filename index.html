@@ -95,8 +95,8 @@
 <body>
   <header class="appbar" role="banner">
     <div class="brand" aria-hidden="false">
-      <img src="images/moj-obrazek.png" alt="Logo" />
-      <h2>Wyszukiwarka</h2>
+      <img src="images/moj-obrazek.png" alt="Wyszukiwarka" />
+      <!-- removed visible site title for a minimalist header -->
     </div>
 
     <div class="controls" role="toolbar" aria-label="Kontrolki">
@@ -117,11 +117,8 @@
 
   <main>
     <section class="card" aria-labelledby="searchTitle">
-      <div class="left">
-        <h3 id="searchTitle" class="headline">Minimalna wyszukiwarka</h3>
-        <p class="sub">Wpisz zapytanie i naciśnij "Szukaj". Nic więcej.</p>
-      </div>
-
+      <!-- minimalist: no visible heading/text; keep accessible label -->
+      <h3 id="searchTitle" class="sr-only">Szukaj</h3>
       <div class="search-wrap" role="search" aria-label="Wyszukiwarka">
         <input id="q" class="search-input" type="search" placeholder="Szukaj w Google..." aria-label="Pole wyszukiwania" />
         <button id="searchBtn" class="search-btn" type="button">Szukaj</button>

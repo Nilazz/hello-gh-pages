@@ -3,162 +3,277 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Rejestracja</title>
+  <title>Rejestracja — Witaj</title>
+  <meta name="color-scheme" content="light dark">
   <style>
+    /* Material-like clean layout, accessible focus, dark mode */
     :root{
-      --bg:#ffffff; --text:#111827; --card:#f3f4f6;
-      --accent:#2563eb; --accent-2:#1e40af;
+      --bg: #f6f8fb;
+      --surface: #ffffff;
+      --text: #0f1724;
+      --muted: #6b7280;
+      --accent: #1e88ff;
+      --accent-2: #1565c0;
+      --danger: #d32f2f;
+      --success: #059669;
+      --shadow: 0 8px 30px rgba(2,6,23,0.08);
+      --radius: 12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
     [data-theme="dark"]{
-      --bg:#0b1220; --text:#e6eef8; --card:#131826;
-      --accent:#60a5fa; --accent-2:#1e3a8a;
+      --bg:#071025; --surface:#0f1724; --text:#e6eef8; --muted:#9aa7bb;
+      --accent:#60a5fa; --accent-2:#2563eb; --shadow: 0 10px 36px rgba(2,6,23,0.6);
     }
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-      background:var(--bg); color:var(--text); transition:background .2s,color .2s;}
-    .topbar{
-      position:fixed; top:12px; left:12px; right:12px; display:flex; justify-content:space-between; align-items:center;
-      z-index:50;
+
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);transition:background .2s,color .2s;}
+    a{color:var(--accent);text-decoration:none}
+    .top {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 20px; gap:12px;
     }
-    .back-link{color:var(--text); text-decoration:none; font-weight:600; background:transparent;border-radius:8px;padding:8px 10px;}
-    .theme-toggle{
-      width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;
-      background:var(--card);border-radius:10px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;
+    .back {
+      display:inline-flex; gap:10px; align-items:center;
+      color:var(--text); font-weight:600; border-radius:10px; padding:8px 10px;
     }
-    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;}
-    .card{width:100%;max-width:520px;background:var(--card);padding:22px;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.08);}
-    h1{margin:0 0 8px 0;font-size:22px;text-align:center;}
-    p.lead{margin:0 0 18px 0;text-align:center;color:rgba(0,0,0,0.55);}
-    form{display:grid;gap:12px;}
-    label{display:block;font-size:13px;}
+    .back svg{opacity:.9}
+    .theme-toggle {
+      background:transparent;border:1px solid rgba(0,0,0,0.06); padding:8px;border-radius:10px;
+      display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+    }
+    main {
+      min-height: calc(100vh - 72px);
+      display:flex;align-items:center;justify-content:center;padding:24px;
+    }
+    .card {
+      width:100%; max-width:560px; background:var(--surface); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:28px; box-sizing:border-box;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .card:focus-within{ transform: translateY(-4px); box-shadow: 0 20px 48px rgba(2,6,23,0.12); }
+    h1{margin:0 0 6px 0; font-size:22px}
+    p.lead{margin:0 0 18px 0; color:var(--muted); font-size:14px}
+
+    form{display:grid; gap:14px;}
+    .field{display:flex; flex-direction:column; gap:6px;}
+    label{font-size:13px; color:var(--muted);}
     input[type="text"],input[type="email"],input[type="password"]{
-      width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.07);background:transparent;color:var(--text);
-      box-sizing:border-box;outline:none;
+      height:44px; padding:10px 12px; border-radius:10px; border:1px solid rgba(0,0,0,0.08);
+      background:transparent; color:var(--text); outline:none; font-size:15px;
+      transition:box-shadow .12s, border-color .12s;
     }
-    .row{display:flex;gap:10px;}
-    .small{font-size:12px;color:rgba(0,0,0,0.6);}
-    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;}
-    .btn{padding:9px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:600;}
-    .btn-ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--text);}
-    .btn-primary{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 8px 20px rgba(37,99,235,0.14);}
-    .error{color:#d32f2f;font-size:13px;}
-    .success{background:linear-gradient(180deg,#ecfdf5,#bbf7d0);padding:10px;border-radius:8px;color:#065f46;font-weight:600;text-align:center;}
-    @media (max-width:520px){ .topbar{padding:0 6px} .card{padding:16px} }
+    input:focus{ box-shadow: 0 6px 18px rgba(30,136,255,0.08); border-color:var(--accent-2); }
+    .helper{font-size:13px;color:var(--muted);}
+    .row{display:flex;gap:12px}
+    .row .field{flex:1}
+
+    .pw-row{display:flex;align-items:center;gap:8px}
+    .pw-toggle{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:8px;border-radius:8px;cursor:pointer}
+    .meter{height:8px;border-radius:8px;overflow:hidden;background:rgba(0,0,0,0.06)}
+    .meter > i{display:block;height:100%; width:0%; background:linear-gradient(90deg,#ff6b6b,#ffd166,#06d6a0); transition:width .18s;}
+
+    .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
+    .btn{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700;font-size:15px}
+    .btn-ghost{background:transparent;border:1px solid rgba(0,0,0,0.06)}
+    .btn-primary{background:linear-gradient(180deg,var(--accent),var(--accent-2)); color:white; box-shadow:0 8px 20px rgba(37,99,235,0.12)}
+    .btn-primary[aria-disabled="true"]{opacity:.6; cursor:not-allowed; box-shadow:none}
+
+    .error{color:var(--danger); font-size:13px}
+    .success{color:var(--success); font-weight:700; text-align:center; padding:10px; border-radius:8px; background:rgba(6,95,105,0.06)}
+
+    footer{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+
+    /* small screens */
+    @media (max-width:480px){
+      .card{padding:18px}
+      .top{padding:12px}
+    }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <a class="back-link" href="index.html" aria-label="Wróć do strony głównej">← Powrót</a>
-    <button class="theme-toggle" id="themeToggle" aria-label="Przełącz tryb" title="Przełącz tryb"></button>
+  <div class="top" role="banner">
+    <a class="back" href="index.html" aria-label="Wróć do strony głównej">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Powrót
+    </a>
+
+    <button id="themeToggle" class="theme-toggle" aria-label="Przełącz tryb" title="Przełącz tryb" type="button"></button>
   </div>
 
-  <main class="wrap" role="main">
+  <main>
     <section class="card" aria-labelledby="regTitle">
       <h1 id="regTitle">Utwórz konto</h1>
-      <p class="lead">Wypełnij formularz, aby założyć nowe konto (demo — bez wysyłania danych).</p>
+      <p class="lead">Krótki i prosty proces rejestracji. Podane dane nie są wysyłane — demo lokalne.</p>
 
-      <div id="msg"></div>
+      <div id="notice" aria-live="polite"></div>
 
-      <form id="registerForm" novalidate autocomplete="off">
-        <div>
+      <form id="registerForm" novalidate autocomplete="off" aria-describedby="formHelp">
+        <div class="field">
           <label for="user">Nazwa użytkownika</label>
-          <input id="user" name="username" type="text" required minlength="3" placeholder="np. jan_kowal" />
-          <div class="error" id="err-user" aria-live="polite"></div>
+          <input id="user" name="username" type="text" minlength="3" required autocomplete="username" inputmode="text" aria-describedby="err-user" />
+          <div id="err-user" class="error" aria-live="assertive"></div>
         </div>
 
-        <div>
+        <div class="field">
           <label for="email">Email</label>
-          <input id="email" name="email" type="email" required placeholder="adres@przyklad.pl" />
-          <div class="error" id="err-email" aria-live="polite"></div>
+          <input id="email" name="email" type="email" required autocomplete="email" aria-describedby="err-email" />
+          <div id="err-email" class="error" aria-live="assertive"></div>
         </div>
 
         <div class="row">
-          <div style="flex:1">
+          <div class="field">
             <label for="pass">Hasło</label>
-            <input id="pass" name="password" type="password" required minlength="8" placeholder="min. 8 znaków" />
-            <div class="error" id="err-pass" aria-live="polite"></div>
+            <div class="pw-row">
+              <input id="pass" name="password" type="password" required minlength="8" autocomplete="new-password" aria-describedby="err-pass passHelp" />
+              <button type="button" class="pw-toggle" id="togglePw" aria-label="Pokaż hasło">👁</button>
+            </div>
+            <div id="err-pass" class="error" aria-live="assertive"></div>
+            <div id="passHelp" class="helper">Minimum 8 znaków. Użyj liter, cyfr i symboli.</div>
+            <div style="margin-top:8px" class="meter" aria-hidden="true"><i id="pwMeter"></i></div>
           </div>
-          <div style="flex:1">
+
+          <div class="field">
             <label for="pass2">Powtórz hasło</label>
-            <input id="pass2" name="password2" type="password" required placeholder="powtórz hasło" />
-            <div class="error" id="err-pass2" aria-live="polite"></div>
+            <input id="pass2" name="password2" type="password" required autocomplete="new-password" aria-describedby="err-pass2" />
+            <div id="err-pass2" class="error" aria-live="assertive"></div>
           </div>
+        </div>
+
+        <div class="field" style="margin-top:2px">
+          <label style="display:flex; gap:10px; align-items:center; font-size:14px;">
+            <input id="agree" type="checkbox" required aria-describedby="err-agree" />
+            <span>Akceptuję <a href="#" onclick="event.preventDefault()">regulamin</a> i politykę prywatności</span>
+          </label>
+          <div id="err-agree" class="error" aria-live="assertive"></div>
         </div>
 
         <div class="actions">
           <button type="button" class="btn btn-ghost" onclick="location.href='index.html'">Anuluj</button>
-          <button type="submit" class="btn btn-primary">Zarejestruj</button>
+          <button type="submit" id="submitBtn" class="btn btn-primary" aria-disabled="true">Zarejestruj</button>
         </div>
+
+        <div id="formHelp" class="helper" style="margin-top:8px">Masz już konto? <a href="index.html">Zaloguj się</a></div>
       </form>
+
+      <footer>
+        Dane w demo nie są wysyłane. Projekt zgodny z zasadami dostępności i prostoty interakcji.
+      </footer>
     </section>
   </main>
 
   <script>
-    // theme toggle: sync with localStorage key 'theme-preference'
+    // Theme toggle (sync with index.html)
     (function(){
       const btn = document.getElementById('themeToggle');
       const root = document.documentElement;
-      const ls = 'theme-preference';
-      const sun = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor"/></svg>';
-      const moon = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>';
+      const key = 'theme-preference';
+      const sun = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor"/></svg>';
+      const moon = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>';
       function apply(t){
         if(t==='dark'){ root.setAttribute('data-theme','dark'); btn.innerHTML = moon; btn.title='Tryb: ciemny'; }
         else{ root.removeAttribute('data-theme'); btn.innerHTML = sun; btn.title='Tryb: jasny'; }
       }
-      const saved = localStorage.getItem(ls) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const saved = localStorage.getItem(key) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       apply(saved);
       btn.addEventListener('click', ()=> {
         const cur = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
         const next = cur === 'dark' ? 'light' : 'dark';
-        apply(next); localStorage.setItem(ls, next);
+        apply(next); localStorage.setItem(key, next);
       });
     })();
 
-    // registration form validation (client-side demo)
+    // Registration UX: validation, password strength, show/hide, enable submit
     (function(){
       const form = document.getElementById('registerForm');
-      const msg = document.getElementById('msg');
       const user = document.getElementById('user');
       const email = document.getElementById('email');
       const pass = document.getElementById('pass');
       const pass2 = document.getElementById('pass2');
-      const errUser = document.getElementById('err-user');
-      const errEmail = document.getElementById('err-email');
-      const errPass = document.getElementById('err-pass');
-      const errPass2 = document.getElementById('err-pass2');
+      const agree = document.getElementById('agree');
+      const submitBtn = document.getElementById('submitBtn');
+      const notice = document.getElementById('notice');
 
-      function clearErrors(){
-        errUser.textContent=''; errEmail.textContent=''; errPass.textContent=''; errPass2.textContent=''; msg.innerHTML='';
+      const errs = {
+        user: document.getElementById('err-user'),
+        email: document.getElementById('err-email'),
+        pass: document.getElementById('err-pass'),
+        pass2: document.getElementById('err-pass2'),
+        agree: document.getElementById('err-agree')
+      };
+
+      const pwMeter = document.getElementById('pwMeter');
+      const togglePw = document.getElementById('togglePw');
+
+      function clearErrors(){ Object.values(errs).forEach(e => e.textContent=''); notice.innerHTML=''; }
+
+      function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+      // simple password strength estimator
+      function strengthScore(s){
+        let score = 0;
+        if (s.length >= 8) score += 1;
+        if (/[a-z]/.test(s) && /[A-Z]/.test(s)) score += 1;
+        if (/\d/.test(s)) score += 1;
+        if (/[^A-Za-z0-9]/.test(s)) score += 1;
+        return score; // 0..4
+      }
+      function updateMeter(){
+        const sc = strengthScore(pass.value);
+        const w = (sc / 4) * 100;
+        pwMeter.style.width = w + '%';
+        if (sc <=1) pwMeter.style.background = 'linear-gradient(90deg,#ff6b6b,#ff9a9e)';
+        else if (sc === 2) pwMeter.style.background = 'linear-gradient(90deg,#ffd166,#ffae42)';
+        else pwMeter.style.background = 'linear-gradient(90deg,#8be9a6,#06d6a0)';
       }
 
-      function validEmail(v){
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-      }
-
-      form.addEventListener('submit', function(e){
-        e.preventDefault();
-        clearErrors();
-        let ok = true;
-        if(!user.value || user.value.trim().length < 3){ errUser.textContent='Nazwa musi mieć co najmniej 3 znaki.'; ok=false; }
-        if(!email.value || !validEmail(email.value)){ errEmail.textContent='Wprowadź poprawny adres email.'; ok=false; }
-        if(!pass.value || pass.value.length < 8){ errPass.textContent='Hasło musi mieć co najmniej 8 znaków.'; ok=false; }
-        if(pass.value !== pass2.value){ errPass2.textContent='Hasła nie są zgodne.'; ok=false; }
-
-        if(!ok) return;
-
-        // Demo: nie wysyłamy nigdzie. Pokaż komunikat sukcesu i zapisz demo (bez hasła) do localStorage
-        msg.innerHTML = '<div class="success">Konto utworzone (demo). Przekierowanie...</div>';
-        try {
-          const store = JSON.parse(localStorage.getItem('demo-users')||'[]');
-          store.push({username:user.value.trim(), email: email.value.trim(), created: Date.now()});
-          localStorage.setItem('demo-users', JSON.stringify(store));
-        } catch(e){ /* ignore */ }
-
-        // po chwili wróć na stronę główną
-        setTimeout(()=> location.href = 'index.html', 1200);
+      // toggle visibility
+      togglePw.addEventListener('click', () => {
+        const t = pass.type === 'password' ? 'text' : 'password';
+        pass.type = t;
+        pass2.type = t;
+        togglePw.textContent = t === 'text' ? '🙈' : '👁';
+        togglePw.setAttribute('aria-pressed', String(t==='text'));
       });
 
-      // live clear errors
-      [user,email,pass,pass2].forEach(el => el.addEventListener('input', ()=> { if(el.value) { document.getElementById('err-'+(el.id==='pass2'?'pass2':el.id)).textContent=''; } }));
+      function validateAll(showErrors = false){
+        clearErrors();
+        let ok = true;
+        if (!user.value || user.value.trim().length < 3){ ok = false; if (showErrors) errs.user.textContent = 'Nazwa musi mieć min. 3 znaki.'; user.setAttribute('aria-invalid','true'); } else user.removeAttribute('aria-invalid');
+        if (!email.value || !validEmail(email.value)){ ok = false; if (showErrors) errs.email.textContent = 'Podaj poprawny adres email.'; email.setAttribute('aria-invalid','true'); } else email.removeAttribute('aria-invalid');
+        if (!pass.value || pass.value.length < 8){ ok = false; if (showErrors) errs.pass.textContent = 'Hasło musi mieć min. 8 znaków.'; pass.setAttribute('aria-invalid','true'); } else pass.removeAttribute('aria-invalid');
+        if (pass.value !== pass2.value){ ok = false; if (showErrors) errs.pass2.textContent = 'Hasła nie są zgodne.'; pass2.setAttribute('aria-invalid','true'); } else pass2.removeAttribute('aria-invalid');
+        if (!agree.checked){ ok = false; if (showErrors) errs.agree.textContent = 'Musisz zaakceptować regulamin.'; }
+        submitBtn.setAttribute('aria-disabled', String(!ok));
+        return ok;
+      }
+
+      // live UX
+      [user,email,pass,pass2,agree].forEach(el => el.addEventListener('input', () => {
+        updateMeter();
+        validateAll(false);
+      }));
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const ok = validateAll(true);
+        if (!ok) {
+          notice.innerHTML = '';
+          return;
+        }
+        // demo: store user (no password) and show success
+        try {
+          const store = JSON.parse(localStorage.getItem('demo-users')||'[]');
+          store.push({username: user.value.trim(), email: email.value.trim(), created: Date.now()});
+          localStorage.setItem('demo-users', JSON.stringify(store));
+        } catch (err) { /* ignore */ }
+
+        notice.innerHTML = '<div class="success" role="status">Konto utworzone. Przekierowanie...</div>';
+        setTimeout(()=> location.href = 'index.html', 1100);
+      });
+
+      // initial meter and validation
+      updateMeter();
+      validateAll(false);
     })();
   </script>
 </body>

@@ -75,7 +75,21 @@
     <p class="lead">Przykładowa galeria zdjęć z lekkim lightboxem. Kliknij miniaturę, aby powiększyć — obsługa klawiatury: ← → Esc.</p>
 
     <div class="grid" id="gallery">
-      <!-- use picsum placeholders; replace src with local files images/photo1.jpg etc. -->
+      <!-- use picsum placeholders; you can replace or prepend with your own files from the Images folder (Images/1.png, Images/2.png, Images/3.png) -->
+      <!-- added: local Images cards -->
+      <a class="card" href="#" data-src="Images/1.png" data-title="Moje zdjęcie 1">
+        <img src="Images/1.png" alt="Moje zdjęcie 1">
+        <div class="caption">Moje zdjęcie 1</div>
+      </a>
+      <a class="card" href="#" data-src="Images/2.png" data-title="Moje zdjęcie 2">
+        <img src="Images/2.png" alt="Moje zdjęcie 2">
+        <div class="caption">Moje zdjęcie 2</div>
+      </a>
+      <a class="card" href="#" data-src="Images/3.png" data-title="Moje zdjęcie 3">
+        <img src="Images/3.png" alt="Moje zdjęcie 3">
+        <div class="caption">Moje zdjęcie 3</div>
+      </a>
+
       <a class="card" href="#" data-src="https://picsum.photos/id/1015/1600/1000" data-title="Góry">
         <img src="https://picsum.photos/id/1015/800/500" alt="Góry">
         <div class="caption">Góry</div>

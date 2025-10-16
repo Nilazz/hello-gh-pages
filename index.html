@@ -32,12 +32,32 @@
     .lewy-gorny-obrazek {
       position: absolute;
       top: 10px;
-      left: 50px;     /* przesunięty, żeby nie kolidował z hamburgerem */
+      left: 50px;
       width: 80px;
       height: auto;
       margin: 0;
       z-index: 10;
     }
+
+    /* theme icon (top-right, left of hamburger) */
+    .theme-toggle {
+      position: fixed;
+      top: 10px;
+      right: 64px; /* left of hamburger (hamburger right:10px width ~44px + gap) */
+      width: 44px;
+      height: 44px;
+      padding: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card);
+      color: var(--text);
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.06);
+      cursor: pointer;
+      z-index: 42;
+    }
+    .theme-toggle svg { width:22px; height:22px; display:block; }
 
     /* hamburger (top-right) */
     .hamburger {
@@ -98,22 +118,6 @@
       background: rgba(0,0,0,0.04);
     }
 
-    /* theme toggle moved to top-left to avoid overlap */
-    .theme-toggle {
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      right: auto;
-      z-index: 30;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid rgba(0,0,0,0.06);
-      padding: 6px 10px;
-      border-radius: 999px;
-      cursor: pointer;
-      user-select: none;
-    }
-
     /* centered container with header + search */
     .center {
       height: 100vh;
@@ -167,10 +171,22 @@
       .search-wrap { padding: 10px; gap: 8px; }
       .search-btn { padding: 9px 12px; }
       .lewy-gorny-obrazek { width: 56px; left: 46px; }
+      .theme-toggle { right: 60px; } /* small adjustment on mobile */
     }
   </style>
 </head>
 <body>
+  <!-- ...existing code... -->
+  <img src="images/moj-obrazek.png" alt="Mój obrazek" class="lewy-gorny-obrazek" />
+
+  <button class="theme-toggle" id="themeToggle" aria-label="Przełącz tryb" aria-pressed="false">
+    <!-- svg will be controlled by JS -->
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor"/>
+    </svg>
+  </button>
+
   <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
     <span></span>
     <span></span>
@@ -182,10 +198,6 @@
     <button type="button" role="menuitem">Zarejestruj</button>
   </div>
 
-  <img src="images/moj-obrazek.png" alt="Mój obrazek" class="lewy-gorny-obrazek" />
-
-  <button class="theme-toggle" id="themeToggle" aria-pressed="false">Tryb: jasny</button>
-
   <main class="center">
     <h1>Wyszukiwarka</h1>
 
@@ -195,21 +207,33 @@
     </div>
   </main>
 
-  <!-- ...existing code... -->
   <script>
-    // theme toggle with persistence
+    // theme toggle with icon, persistence
     (function(){
       const root = document.documentElement;
       const btn = document.getElementById('themeToggle');
       const lsKey = 'theme-preference';
+
+      const svgSun = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="currentColor"/></svg>';
+      const svgMoon = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>';
+
       function applyTheme(t) {
-        if (t === 'dark') root.setAttribute('data-theme','dark');
-        else root.removeAttribute('data-theme');
-        btn.textContent = 'Tryb: ' + (t === 'dark' ? 'ciemny' : 'jasny');
-        btn.setAttribute('aria-pressed', t === 'dark');
+        if (t === 'dark') {
+          root.setAttribute('data-theme','dark');
+          btn.innerHTML = svgMoon;
+          btn.setAttribute('aria-pressed','true');
+          btn.setAttribute('title','Tryb: ciemny');
+        } else {
+          root.removeAttribute('data-theme');
+          btn.innerHTML = svgSun;
+          btn.setAttribute('aria-pressed','false');
+          btn.setAttribute('title','Tryb: jasny');
+        }
       }
+
       const saved = localStorage.getItem(lsKey) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       applyTheme(saved);
+
       btn.addEventListener('click', () => {
         const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
         const next = current === 'dark' ? 'light' : 'dark';
@@ -237,8 +261,7 @@
       const ham = document.getElementById('hamburger');
       const menu = document.getElementById('menu');
       ham.addEventListener('click', () => {
-        const open = !ham.classList.toggle('open');
-        // toggle aria
+        ham.classList.toggle('open');
         const isOpen = ham.classList.contains('open');
         ham.setAttribute('aria-expanded', String(isOpen));
         menu.classList.toggle('open', isOpen);
@@ -246,7 +269,7 @@
       });
       // close menu on outside click or ESC
       document.addEventListener('click', (e) => {
-        if (!menu.contains(e.target) && !ham.contains(e.target)) {
+        if (!menu.contains(e.target) && !ham.contains(e.target) && !document.getElementById('themeToggle').contains(e.target)) {
           ham.classList.remove('open');
           ham.setAttribute('aria-expanded','false');
           menu.classList.remove('open');

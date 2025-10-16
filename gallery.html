@@ -75,18 +75,22 @@
     <p class="lead">Przykładowa galeria zdjęć z lekkim lightboxem. Kliknij miniaturę, aby powiększyć — obsługa klawiatury: ← → Esc.</p>
 
     <div class="grid" id="gallery">
-      <!-- używaj zdjęć wgranych na serwer w folderze Images -->
-      <a class="card" href="#" data-src="Images/1.png" data-title="Zdjęcie 1">
-        <img src="Images/1.png" alt="Zdjęcie 1">
+      <!-- obrazki: używamy tylko nazwy pliku — ścieżkę wybierzemy dynamicznie (resolver sprawdzi Images/ i images/) -->
+      <a class="card" href="#" data-filename="1.png" data-title="Zdjęcie 1">
+        <img src="" alt="Zdjęcie 1">
         <div class="caption">Zdjęcie 1</div>
       </a>
-      <a class="card" href="#" data-src="Images/2.png" data-title="Zdjęcie 2">
-        <img src="Images/2.png" alt="Zdjęcie 2">
+      <a class="card" href="#" data-filename="2.png" data-title="Zdjęcie 2">
+        <img src="" alt="Zdjęcie 2">
         <div class="caption">Zdjęcie 2</div>
       </a>
-      <a class="card" href="#" data-src="Images/3.png" data-title="Zdjęcie 3">
-        <img src="Images/3.png" alt="Zdjęcie 3">
+      <a class="card" href="#" data-filename="3.png" data-title="Zdjęcie 3">
+        <img src="" alt="Zdjęcie 3">
         <div class="caption">Zdjęcie 3</div>
+      </a>
+      <a class="card" href="#" data-filename="4.png" data-title="Zdjęcie 4">
+        <img src="" alt="Zdjęcie 4">
+        <div class="caption">Zdjęcie 4</div>
       </a>
     </div>
   </div>
@@ -127,8 +131,43 @@
       });
     })();
 
+    // resolve image folder (try several common prefixes) and set src/data-src for gallery items
+    (function(){
+      const prefixes = ['Images/','images/','./Images/','./images/','/Images/','/images/'];
+      const cards = Array.from(document.querySelectorAll('#gallery .card'));
+      function testImage(url){
+        return new Promise(resolve => {
+          const img = new Image();
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+          img.src = url + '?_=' + Date.now();
+        });
+      }
+      async function resolvePrefixes(){
+        if(!cards.length) return;
+        for(const p of prefixes){
+          const firstName = cards[0].dataset.filename;
+          if(!firstName) break;
+          const ok = await testImage(p + firstName);
+          if(ok){
+            cards.forEach(c => {
+              const name = c.dataset.filename;
+              const url = p + name;
+              c.dataset.src = url;
+              const img = c.querySelector('img');
+              if(img) img.src = url;
+            });
+            return;
+          }
+        }
+        console.warn('Nie znaleziono obrazów w prefiksach:', prefixes);
+      }
+      resolvePrefixes();
+    })();
+
     // gallery + lightbox
     (function(){
+      // items: dataset.src should be set by resolver above
       const items = Array.from(document.querySelectorAll('#gallery .card'));
       const lb = document.getElementById('lb');
       const lbImg = document.getElementById('lbImg');
@@ -137,18 +176,19 @@
       const next = document.getElementById('next');
       const close = document.getElementById('close');
       let index = -1;
-
+ 
       function open(i){
         const it = items[i];
         if(!it) return;
         index = i;
-        lbImg.src = it.dataset.src;
+        // prefer resolved data-src, fall back to filename if needed
+        lbImg.src = it.dataset.src || it.dataset.filename || '';
         lbImg.alt = it.querySelector('img').alt || '';
         lbTitle.textContent = it.dataset.title || '';
         lb.classList.add('open');
         lb.setAttribute('aria-hidden','false');
         document.body.style.overflow = 'hidden';
-      }
+       }
       function closeLB(){
         lb.classList.remove('open');
         lb.setAttribute('aria-hidden','true');

@@ -76,6 +76,44 @@
     .menu.open{display:flex}
     .menu button{background:transparent;border:none;padding:10px 12px;text-align:left;border-radius:8px;cursor:pointer;color:var(--text);font-weight:600}
     .menu button:hover{background:rgba(0,0,0,0.04)}
+
+    /* contact page: nicer presentation */
+    .contact-grid{ display:grid; grid-template-columns:1fr 360px; gap:20px; align-items:start; margin-top:12px; }
+    @media (max-width:880px){ .contact-grid{ grid-template-columns:1fr } }
+
+    .contact-item{
+      display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:10px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
+    }
+    .contact-item + .contact-item{ margin-top:10px; }
+
+    .contact-item .icon{
+      width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+      background:var(--accent); color:#fff; font-weight:700; box-shadow:0 8px 20px rgba(30,136,255,0.08);
+      flex:0 0 48px; font-size:18px;
+    }
+    .contact-item .detail h3{ margin:0; font-size:14px; }
+    .contact-item .detail p{ margin:6px 0 0; color:var(--muted); font-size:14px; }
+
+    .map{
+      height:180px; border-radius:10px; background:linear-gradient(180deg, rgba(2,6,23,0.04), rgba(2,6,23,0.02));
+      display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px; box-shadow:var(--shadow);
+    }
+
+    .contact-form{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+    .contact-form input, .contact-form textarea{
+      padding:10px 12px; border-radius:10px; border:1px solid rgba(0,0,0,0.08); background:rgba(255,255,255,0.96);
+      color:var(--text); font-size:14px; box-sizing:border-box; resize:vertical;
+    }
+    [data-theme="dark"] .contact-form input, [data-theme="dark"] .contact-form textarea{
+      background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06);
+    }
+    .contact-form input:focus, .contact-form textarea:focus{
+      outline: none; box-shadow: 0 10px 30px rgba(37,99,235,0.08); border-color:var(--accent-2);
+      background:var(--surface);
+    }
+
+    .meta-note{ font-size:13px; color:var(--muted); margin-top:8px; }
   </style>
 </head>
 <body>
@@ -106,13 +144,52 @@
   <main>
     <div class="card" role="main" aria-labelledby="contactTitle">
       <h1 id="contactTitle" style="margin-top:6px">Kontakt</h1>
-      <p class="muted" style="color:var(--muted)">Masz pytania? Napisz lub zadzwoń — odpowiemy najszybciej jak to możliwe.</p>
+      <p class="muted" style="color:var(--muted)">Masz pytania? Krótko i przejrzyście — zobacz dane i napisz wiadomość.</p>
 
-      <section style="margin-top:18px;display:grid;gap:10px">
-        <div><strong>Email:</strong> <a href="mailto:kontakt@example.com">kontakt@example.com</a></div>
-        <div><strong>Telefon:</strong> <a href="tel:+48123456789">+48 123 456 789</a></div>
-        <div><strong>Adres:</strong> Ul. Przykładowa 1, 00-000 Miasto</div>
-      </section>
+      <div class="contact-grid">
+        <div>
+          <div class="contact-item" role="article" aria-label="Email">
+            <div class="icon" aria-hidden="true">✉</div>
+            <div class="detail">
+              <h3>Email</h3>
+              <p><a href="mailto:kontakt@example.com">kontakt@example.com</a></p>
+            </div>
+          </div>
+
+          <div class="contact-item" role="article" aria-label="Telefon">
+            <div class="icon" aria-hidden="true">📞</div>
+            <div class="detail">
+              <h3>Telefon</h3>
+              <p><a href="tel:+48123456789">+48 123 456 789</a></p>
+            </div>
+          </div>
+
+          <div class="contact-item" role="article" aria-label="Adres">
+            <div class="icon" aria-hidden="true">📍</div>
+            <div class="detail">
+              <h3>Adres</h3>
+              <p>Ul. Przykładowa 1, 00-000 Miasto</p>
+            </div>
+          </div>
+
+          <div class="meta-note">Godziny pracy: pn–pt 9:00–17:00</div>
+        </div>
+
+        <aside>
+          <div class="map" role="img" aria-label="Mapa — lokalizacja">MAPA (podgląd)</div>
+
+          <form id="contactForm" class="contact-form" aria-label="Formularz kontaktowy">
+            <input id="cname" name="name" type="text" placeholder="Twoje imię" required />
+            <input id="cemail" name="email" type="email" placeholder="Twój email" required />
+            <textarea id="cmsg" name="message" rows="5" placeholder="Twoja wiadomość" required></textarea>
+
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button type="button" class="btn btn-ghost" onclick="document.getElementById('contactForm').reset()">Wyczyść</button>
+              <button type="submit" class="btn btn-primary">Wyślij</button>
+            </div>
+          </form>
+        </aside>
+      </div>
     </div>
   </main>
 
@@ -207,6 +284,22 @@
       if(contact){ contact.addEventListener('click', e=>{ e.stopPropagation(); document.getElementById('hamburger').classList.remove('open'); const m=document.getElementById('menu'); if(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); } setTimeout(()=> location.href = 'contact.html', 80); }); }
       const login = document.getElementById('loginBtn');
       if(login){ login.addEventListener('click', e=>{ e.stopPropagation(); document.getElementById('hamburger').classList.remove('open'); const m=document.getElementById('menu'); if(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); } setTimeout(()=> location.href = 'index.html', 80); }); }
+    })();
+
+    // kontakt: prosty handler formularza — otwiera mailto (demo)
+    (function(){
+      const form = document.getElementById('contactForm');
+      if(!form) return;
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const name = document.getElementById('cname').value.trim();
+        const email = document.getElementById('cemail').value.trim();
+        const msg = document.getElementById('cmsg').value.trim();
+        if(!name || !email || !msg){ alert('Uzupełnij wszystkie pola.'); return; }
+        const subject = encodeURIComponent('Kontakt z formularza: ' + name);
+        const body = encodeURIComponent('Imię: ' + name + '\nEmail: ' + email + '\n\n' + msg);
+        window.location.href = `mailto:kontakt@example.com?subject=${subject}&body=${body}`;
+      });
     })();
   </script>
 </body>

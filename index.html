@@ -68,6 +68,60 @@
     }
     .search-btn:active{transform:translateY(1px)}
 
+    /* Google-like material adjustments for buttons and inputs */
+    :root{
+      --input-bg: rgba(242,245,250,1);
+      --input-border: rgba(15,23,36,0.12);
+      --focus-ring: rgba(37,99,235,0.16);
+      --btn-radius: 12px;
+      --elevation-1: 0 6px 18px rgba(2,6,23,0.08);
+    }
+    [data-theme="dark"]{
+      --input-bg: rgba(255,255,255,0.03);
+      --input-border: rgba(255,255,255,0.06);
+    }
+
+    /* Generic button tokens (apply across site) */
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px; border-radius:var(--btn-radius); font-weight:700; font-size:15px;
+      border: none; cursor:pointer; transition:transform .08s, box-shadow .12s, background .12s, opacity .12s;
+      height:44px;
+    }
+    .btn-primary{
+      background:linear-gradient(180deg,var(--accent),var(--accent-2));
+      color:#fff; box-shadow:var(--elevation-1);
+    }
+    .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(37,99,235,0.16); }
+    .btn-primary:focus{ outline:3px solid var(--focus-ring); outline-offset:2px; }
+
+    .btn-ghost{
+      background:transparent; border:1px solid var(--input-border); color:var(--text);
+    }
+    .btn-ghost:focus{ outline:3px solid var(--focus-ring); outline-offset:2px; }
+
+    /* icon buttons keep shape but use material focus */
+    .icon-btn{ border-radius:10px; border:1px solid var(--input-border); background:var(--surface); }
+    .icon-btn:focus{ outline:3px solid var(--focus-ring); outline-offset:2px; }
+
+    /* unify search button with .btn-primary */
+    .search-btn{ height:48px; padding:12px 18px; border-radius:12px; border:none; background:linear-gradient(180deg,var(--accent),var(--accent-2)); color:#fff; font-weight:700; cursor:pointer; box-shadow:var(--elevation-1); }
+    .search-btn:focus{ outline:3px solid var(--focus-ring); outline-offset:2px; }
+
+    /* Modal inputs — stronger background, clear border and pronounced focus */
+    .modal input{
+      height:48px; padding:12px 14px; border-radius:10px;
+      border:1px solid var(--input-border); background:var(--input-bg); color:var(--text);
+      box-sizing:border-box; font-size:15px; transition:box-shadow .12s, border-color .12s, background .12s;
+    }
+    .modal input::placeholder{ color:var(--muted); opacity:0.9; }
+    .modal input:focus{
+      box-shadow:0 10px 30px rgba(37,99,235,0.08); border-color:var(--accent-2); outline:none;
+      background:var(--surface);
+    }
+    .modal .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .modal .actions{display:flex;gap:8px;justify-content:flex-end}
+
     /* responsive */
     @media (max-width:880px){
       .card{flex-direction:column;align-items:stretch;padding:20px}
@@ -169,8 +223,9 @@
         </div>
 
         <div class="actions" style="margin-top:6px">
-          <button id="loginCancel" type="button" class="icon-btn btn-ghost">Anuluj</button>
-          <button type="submit" class="search-btn">Zaloguj</button>
+          <!-- use standardized button classes -->
+          <button id="loginCancel" type="button" class="btn btn-ghost">Anuluj</button>
+          <button type="submit" class="btn btn-primary">Zaloguj</button>
         </div>
       </form>
     </div>

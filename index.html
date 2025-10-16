@@ -118,6 +118,64 @@
       background: rgba(0,0,0,0.04);
     }
 
+    /* modal (login) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--card);
+      color: var(--text);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(2,6,23,0.25);
+      padding: 20px;
+    }
+    .modal h2 { margin: 0 0 12px 0; font-size: 18px; }
+    .modal form { display: grid; gap: 10px; }
+    .modal input[type="text"],
+    .modal input[type="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: transparent;
+      color: var(--text);
+      outline: none;
+      box-sizing: border-box;
+    }
+    .modal .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .btn-primary {
+      background: linear-gradient(180deg,var(--accent),var(--accent-2));
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(37,99,235,0.16);
+    }
+
     /* centered container with header + search */
     .center {
       height: 100vh;
@@ -194,7 +252,7 @@
   </button>
 
   <div class="menu" id="menu" role="menu" aria-hidden="true">
-    <button type="button" role="menuitem">Zaloguj</button>
+    <button id="loginBtn" type="button" role="menuitem">Zaloguj</button>
     <button type="button" role="menuitem">Zarejestruj</button>
   </div>
 
@@ -206,6 +264,28 @@
       <button id="searchBtn" class="search-btn" type="button">Szukaj</button>
     </div>
   </main>
+
+  <!-- Login modal -->
+  <div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document" aria-labelledby="loginTitle">
+      <h2 id="loginTitle">Zaloguj się</h2>
+      <form id="loginForm" autocomplete="off">
+        <label>
+          <span class="sr-only">Nazwa użytkownika</span>
+          <input id="loginUser" name="username" type="text" placeholder="Nazwa użytkownika" required />
+        </label>
+        <label>
+          <span class="sr-only">Hasło</span>
+          <input id="loginPass" name="password" type="password" placeholder="Hasło" required />
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="loginCancel">Anuluj</button>
+          <button type="submit" class="btn btn-primary">Zaloguj</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     // theme toggle with icon, persistence
@@ -283,6 +363,73 @@
           menu.classList.remove('open');
           menu.setAttribute('aria-hidden','true');
         }
+      });
+    })();
+
+    // login modal behaviour
+    (function(){
+      const loginBtn = document.getElementById('loginBtn');
+      const modal = document.getElementById('loginModal');
+      const loginForm = document.getElementById('loginForm');
+      const cancelBtn = document.getElementById('loginCancel');
+      const firstInput = document.getElementById('loginUser');
+
+      function openModal() {
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+        // close menu if open
+        document.getElementById('hamburger').classList.remove('open');
+        document.getElementById('menu').classList.remove('open');
+        // focus first input after a tick
+        setTimeout(() => firstInput.focus(), 50);
+        // trap focus basic: listen tab
+        document.addEventListener('focus', trapFocus, true);
+        document.addEventListener('keydown', onKeyDown);
+      }
+
+      function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden','true');
+        document.removeEventListener('focus', trapFocus, true);
+        document.removeEventListener('keydown', onKeyDown);
+        // return focus to login button
+        loginBtn.focus();
+      }
+
+      function trapFocus(e) {
+        if (!modal.contains(e.target)) {
+          e.stopPropagation();
+          firstInput.focus();
+        }
+      }
+
+      function onKeyDown(e) {
+        if (e.key === 'Escape') closeModal();
+      }
+
+      // open on click
+      loginBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openModal();
+      });
+
+      // close when clicking backdrop (but not modal content)
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      cancelBtn.addEventListener('click', (e) => { e.preventDefault(); closeModal(); });
+
+      // fake submit: prevent actual navigation, close modal
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // here you can add validation / send request
+        // For now just close modal
+        closeModal();
+        // optional: show simple confirmation in console
+        console.log('Login submitted:', {
+          username: loginForm.username.value
+        });
       });
     })();
   </script>

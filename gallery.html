@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Galeria</title>
+  <meta name="color-scheme" content="light dark">
+  <style>
+    :root{
+      --bg:#f6f8fb; --surface:#ffffff; --text:#0f1724; --muted:#6b7280;
+      --accent:#1e88ff; --radius:12px; --shadow:0 8px 30px rgba(2,6,23,0.08);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    }
+    [data-theme="dark"]{
+      --bg:#071025; --surface:#0f1724; --text:#e6eef8; --muted:#9aa7bb;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px}
+    header a{color:var(--text);text-decoration:none;font-weight:600;display:inline-flex;gap:8px;align-items:center}
+    .wrap{max-width:1100px;margin:0 auto;padding:12px 20px 48px;box-sizing:border-box}
+    h1{margin:6px 0 12px;font-size:22px}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+    }
+    .card{
+      background:var(--surface);
+      border-radius:10px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      display:block;
+      position:relative;
+      cursor:zoom-in;
+    }
+    .card img{width:100%;height:200px;object-fit:cover;display:block;transition:transform .18s}
+    .card:hover img{transform:scale(1.03)}
+    .caption{
+      position:absolute;left:10px;right:10px;bottom:10px;padding:6px 8px;border-radius:8px;background:linear-gradient(180deg,rgba(0,0,0,0.15),rgba(0,0,0,0.3));
+      color:white;font-size:13px;backdrop-filter: blur(4px);
+    }
+
+    /* responsive */
+    @media (max-width:980px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    @media (max-width:680px){ .grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:420px){ .grid{grid-template-columns:1fr} .card img{height:160px} }
+
+    /* lightbox */
+    .lb-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:120;padding:18px}
+    .lb-backdrop.open{display:flex}
+    .lb{
+      width:100%;max-width:1100px;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.6);
+      display:flex;flex-direction:column;align-items:center;
+    }
+    .lb img{width:100%;height:auto;display:block;max-height:80vh;object-fit:contain;background:#000}
+    .lb .meta{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:linear-gradient(180deg,rgba(0,0,0,0.4),rgba(0,0,0,0.2));color:#fff}
+    .lb .meta .title{font-weight:700}
+    .lb .controls{display:flex;gap:8px}
+    .btn{background:rgba(255,255,255,0.08);border:none;padding:8px 10px;border-radius:8px;color:#fff;cursor:pointer}
+    .btn:active{transform:translateY(1px)}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" aria-label="Wróć do strony głównej">← Powrót</a>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button id="themeToggle" aria-label="Przełącz tryb" title="Przełącz tryb" style="height:44px;width:44px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);background:var(--surface)"></button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <h1>Galeria</h1>
+    <p class="lead">Przykładowa galeria zdjęć z lekkim lightboxem. Kliknij miniaturę, aby powiększyć — obsługa klawiatury: ← → Esc.</p>
+
+    <div class="grid" id="gallery">
+      <!-- use picsum placeholders; replace src with local files images/photo1.jpg etc. -->
+      <a class="card" href="#" data-src="https://picsum.photos/id/1015/1600/1000" data-title="Góry">
+        <img src="https://picsum.photos/id/1015/800/500" alt="Góry">
+        <div class="caption">Góry</div>
+      </a>
+      <a class="card" href="#" data-src="https://picsum.photos/id/1025/1600/1000" data-title="Pies">
+        <img src="https://picsum.photos/id/1025/800/500" alt="Pies">
+        <div class="caption">Pies</div>
+      </a>
+      <a class="card" href="#" data-src="https://picsum.photos/id/1035/1600/1000" data-title="Miasto">
+        <img src="https://picsum.photos/id/1035/800/500" alt="Miasto">
+        <div class="caption">Miasto</div>
+      </a>
+      <a class="card" href="#" data-src="https://picsum.photos/id/1043/1600/1000" data-title="Morze">
+        <img src="https://picsum.photos/id/1043/800/500" alt="Morze">
+        <div class="caption">Morze</div>
+      </a>
+      <a class="card" href="#" data-src="https://picsum.photos/id/1050/1600/1000" data-title="Las">
+        <img src="https://picsum.photos/id/1050/800/500" alt="Las">
+        <div class="caption">Las</div>
+      </a>
+      <a class="card" href="#" data-src="https://picsum.photos/id/1062/1600/1000" data-title="Droga">
+        <img src="https://picsum.photos/id/1062/800/500" alt="Droga">
+        <div class="caption">Droga</div>
+      </a>
+      <a class="card" href="#" data-src="https://picsum.photos/id/1074/1600/1000" data-title="Architektura">
+        <img src="https://picsum.photos/id/1074/800/500" alt="Architektura">
+        <div class="caption">Architektura</div>
+      </a>
+      <a class="card" href="#" data-src="https://picsum.photos/id/1084/1600/1000" data-title="Zachód słońca">
+        <img src="https://picsum.photos/id/1084/800/500" alt="Zachód słońca">
+        <div class="caption">Zachód słońca</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- lightbox -->
+  <div id="lb" class="lb-backdrop" role="dialog" aria-hidden="true" aria-label="Podgląd obrazu">
+    <div class="lb" role="document">
+      <img id="lbImg" src="" alt="">
+      <div class="meta">
+        <div class="title" id="lbTitle"></div>
+        <div class="controls">
+          <button id="prev" class="btn" title="Poprzednie">←</button>
+          <button id="next" class="btn" title="Następne">→</button>
+          <button id="close" class="btn" title="Zamknij">✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // theme toggle: reuse key 'theme-preference' so pages stay in sync
+    (function(){
+      const btn = document.getElementById('themeToggle');
+      const root = document.documentElement;
+      const key = 'theme-preference';
+      const sun = '☀';
+      const moon = '🌙';
+      function apply(t){
+        if(t==='dark'){ root.setAttribute('data-theme','dark'); btn.textContent = moon; }
+        else{ root.removeAttribute('data-theme'); btn.textContent = sun; }
+      }
+      const saved = localStorage.getItem(key) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      apply(saved);
+      btn.addEventListener('click', ()=> {
+        const cur = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const next = cur === 'dark' ? 'light' : 'dark';
+        apply(next); localStorage.setItem(key, next);
+      });
+    })();
+
+    // gallery + lightbox
+    (function(){
+      const items = Array.from(document.querySelectorAll('#gallery .card'));
+      const lb = document.getElementById('lb');
+      const lbImg = document.getElementById('lbImg');
+      const lbTitle = document.getElementById('lbTitle');
+      const prev = document.getElementById('prev');
+      const next = document.getElementById('next');
+      const close = document.getElementById('close');
+      let index = -1;
+
+      function open(i){
+        const it = items[i];
+        if(!it) return;
+        index = i;
+        lbImg.src = it.dataset.src;
+        lbImg.alt = it.querySelector('img').alt || '';
+        lbTitle.textContent = it.dataset.title || '';
+        lb.classList.add('open');
+        lb.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeLB(){
+        lb.classList.remove('open');
+        lb.setAttribute('aria-hidden','true');
+        document.body.style.overflow = '';
+        lbImg.src = '';
+      }
+      function showPrev(){ if(index > 0) open(index - 1); }
+      function showNext(){ if(index < items.length - 1) open(index + 1); }
+
+      items.forEach((a,i) => {
+        a.addEventListener('click', e => { e.preventDefault(); open(i); });
+      });
+      prev.addEventListener('click', showPrev);
+      next.addEventListener('click', showNext);
+      close.addEventListener('click', closeLB);
+      lb.addEventListener('click', e => { if(e.target === lb) closeLB(); });
+
+      document.addEventListener('keydown', e => {
+        if(!lb.classList.contains('open')) return;
+        if(e.key === 'Escape') closeLB();
+        if(e.key === 'ArrowLeft') showPrev();
+        if(e.key === 'ArrowRight') showNext();
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -112,6 +112,7 @@
     <button id="loginBtn" type="button" role="menuitem">Zaloguj</button>
     <button id="registerBtn" type="button" role="menuitem">Zarejestruj</button>
     <button id="galleryBtn" type="button" role="menuitem">Galeria</button>
+    <button id="contactBtn" type="button" role="menuitem">Kontakt</button>
   </div>
 
   <main>
@@ -252,6 +253,16 @@
           document.getElementById('hamburger').classList.remove('open');
           const menu = document.getElementById('menu'); if(menu){ menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); }
           setTimeout(()=> location.href = 'gallery.html', 80);
+        });
+      }
+
+      const contact = document.getElementById('contactBtn');
+      if(contact){
+        contact.addEventListener('click', e=>{
+          e.stopPropagation();
+          document.getElementById('hamburger').classList.remove('open');
+          const menu = document.getElementById('menu'); if(menu){ menu.classList.remove('open'); menu.setAttribute('aria-hidden','true'); }
+          setTimeout(()=> location.href = 'contact.html', 80);
         });
       }
     })();
